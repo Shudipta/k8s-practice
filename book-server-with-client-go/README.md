@@ -26,3 +26,8 @@ all of the above commands, i.e.
 
   `go run main.go create svc --kubeconfig=$HOME/.kube/config`
   
+Now we can check that our deployment and service created by running
+`kubectl get deploy` and `kubectl get svc`
+
+We can browse the url http://<node_ip>:<node_port>.
+The full url is shown when service is created.
