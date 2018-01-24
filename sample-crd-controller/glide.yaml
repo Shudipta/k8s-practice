@@ -1,0 +1,21 @@
+package: k8s-practice/sample-crd-controller
+import:
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1
+  - pkg/runtime
+  - pkg/runtime/schema
+- package: k8s.io/code-generator
+  version: dac22934f1bf35605309431df35132fc2811bc41
+- package: k8s.io/client-go
+  subpackages:
+  - kubernetes
+  - tools/cache
+  - tools/clientcmd
+  - util/homedir
+  - util/workqueue
+- package: github.com/spf13/cobra
+- package: github.com/spf13/pflag
+  repo: https://github.com/appscode/pflag.git
+  vcs: git
+  version: master

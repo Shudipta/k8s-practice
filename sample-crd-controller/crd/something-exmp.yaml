@@ -1,4 +1,4 @@
-apiVersion: alpha.crd.com/v1alpha1
+apiVersion: samplecrdcontroller.crd.com/v1alpha1
 kind: Something
 metadata:
   name: something-exmp
