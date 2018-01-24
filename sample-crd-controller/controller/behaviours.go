@@ -60,14 +60,14 @@ func (c *Controller) runSomethingWorker() {
 }
 
 func (c *Controller) runDeploymentWorker() {
-	for c.processNextWorkItem() {
+	for c.processNextDeploymetWorkItem() {
 	}
 }
 
 // processNextWorkItem will read a single work item off the workqueue and
 // attempt to process it, by calling the syncHandler.
 func (c *Controller) processNextSomethingWorkItem() bool {
-	key, shutdown := c.somethingsQueue.Get()
+	obj, shutdown := c.somethingsQueue.Get()
 
 	if shutdown {
 		return false
@@ -81,7 +81,7 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 		// not call Forget if a transient error occurs, instead the item is
 		// put back on the workqueue and attempted again after a back-off
 		// period.
-		defer c.somethingsQueue.Done(key)
+		defer c.somethingsQueue.Done(obj)
 		var key string
 		var ok bool
 		// We expect strings to come off the workqueue. These are of the
@@ -104,7 +104,7 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 		}
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
-		c.workqueue.Forget(obj)
+		c.somethingsQueue.Forget(obj)
 		glog.Infof("Successfully synced '%s'", key)
 		return nil
 	}(obj)
@@ -164,40 +164,55 @@ func (c *Controller) somethingSyncHandler(key string) error {
 		return err
 	}
 
-	// If the Deployment is not controlled by this Foo resource, we should log
+	// If the Deployment is not controlled by this Something resource, we should log
 	// a warning to the event recorder and ret
-	if !metav1.IsControlledBy(deployment, foo) {
-		msg := fmt.Sprintf(MessageResourceExists, deployment.Name)
-		c.recorder.Event(foo, corev1.EventTypeWarning, ErrResourceExists, msg)
+	if !metav1.IsControlledBy(deployment, something) {
+		msg := fmt.Sprintf("Resource %q already exists and is not managed by Something", deployment.Name)
+		//c.recorder.Event(foo, corev1.EventTypeWarning, ErrResourceExists, msg)
 		return fmt.Errorf(msg)
 	}
 
-	// If this number of the replicas on the Foo resource is specified, and the
+	// If the number of the replicas on the Something resource is specified, and the
 	// number does not equal the current desired replicas on the Deployment, we
 	// should update the Deployment resource.
-	if foo.Spec.Replicas != nil && *foo.Spec.Replicas != *deployment.Spec.Replicas {
-		glog.V(4).Infof("Foor: %d, deplR: %d", *foo.Spec.Replicas, *deployment.Spec.Replicas)
-		deployment, err = c.kubeclientset.AppsV1beta2().Deployments(foo.Namespace).Update(newDeployment(foo))
+	if something.Spec.Replicas != nil && *something.Spec.Replicas != *deployment.Spec.Replicas {
+		glog.V(4).Infof("SomethingR: %d, deployR: %d", *something.Spec.Replicas, *deployment.Spec.Replicas)
+		deployment, err = c.kubeclientset.AppsV1beta2().Deployments(something.Namespace).Update(newDeployment(something))
 	}
 
 	// If an error occurs during Update, we'll requeue the item so we can
-	// attempt processing again later. THis could have been caused by a
+	// attempt processing again later. This could have been caused by a
 	// temporary network failure, or any other transient reason.
 	if err != nil {
 		return err
 	}
 
-	// Finally, we update the status block of the Foo resource to reflect the
+	// Finally, we update the status block of the Something resource to reflect the
 	// current state of the world
-	err = c.updateFooStatus(foo, deployment)
+	err = c.updateSomethingStatus(something, deployment)
 	if err != nil {
 		return err
 	}
 
-	c.recorder.Event(foo, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)
+	//c.recorder.Event(foo, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)
 	return nil
 }
 
+func (c *Controller) updateSomethingStatus(
+		something *samplecrdcontrollerv1alpha1.Something,
+		deployment *appsv1beta2.Deployment) error {
+	// NEVER modify objects from the store. It's a read-only, local cache.
+	// You can use DeepCopy() to make a deep copy of original object and modify this copy
+	// Or create a copy manually for better performance
+	somethingCopy := something.DeepCopy()
+	somethingCopy.Status.AvailableReplicas = deployment.Status.AvailableReplicas
+	// Until #38113 is merged, we must use Update instead of UpdateStatus to
+	// update the Status block of the Foo resource. UpdateStatus will not
+	// allow changes to the Spec of the resource, which is ideal for ensuring
+	// nothing other than resource status has been updated.
+	_, err := c.clientset.SamplecrdcontrollerV1alpha1().Somethings(something.Namespace).Update(somethingCopy)
+	return err
+}
 
 // newDeployment creates a new Deployment for a Foo resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
