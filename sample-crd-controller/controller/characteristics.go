@@ -8,13 +8,17 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	//"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/cache"
-	"github.com/golang/glog"
+	//"github.com/golang/glog"
 	//"k8s.io/client-go/scale/scheme/appsv1beta2"
 	kubeinformers "k8s.io/client-go/informers"
 	informers "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
 	//"k8s.io/client-go/scale/scheme/appsv1beta1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	samplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
+	//metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	//"fmt"
+	"fmt"
 )
 
 // Controller implementation for Something resources
@@ -25,7 +29,7 @@ type Controller struct {
 	deploymentsLister	kubelisters.DeploymentLister
 	somethingsLister	listers.SomethingLister
 
-	deploymentsQueue	workqueue.RateLimitingInterface
+	//deploymentsQueue	workqueue.RateLimitingInterface
 	somethingsQueue		workqueue.RateLimitingInterface
 
 	deploymentsInformer	cache.SharedIndexInformer
@@ -50,16 +54,6 @@ func NewController(
 	deploymentInformer := kubeInformerFactory.Apps().V1beta2().Deployments()
 	somethingInformer := sampleInformerFactory.Samplecrdcontroller().V1alpha1().Somethings()
 
-	// Create event broadcaster
-	// Add sample-crd-controller types to the default Kubernetes Scheme so Events can be
-	// logged for sample-crd-controller types.
-	//samplescheme.AddToScheme(scheme.Scheme)
-	//glog.V(4).Info("Creating event broadcaster")
-	//eventBroadcaster := record.NewBroadcaster()
-	//eventBroadcaster.StartLogging(glog.Infof)
-	//eventBroadcaster.StartRecordingToSink(&typedcorev1.EventSinkImpl{Interface: kubeclientset.CoreV1().Events("")})
-	//recorder := eventBroadcaster.NewRecorder(scheme.Scheme, corev1.EventSource{Component: controllerAgentName})
-
 	controller := &Controller{
 		kubeclientset:		kubeclientset,
 		clientset:			clientset,
@@ -73,18 +67,20 @@ func NewController(
 		deploymentsSynced:	deploymentInformer.Informer().HasSynced,
 		somethingsSynced:	somethingInformer.Informer().HasSynced,
 
-		deploymentsQueue:	workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Deployments"),
+		//deploymentsQueue:	workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Deployments"),
 		somethingsQueue:	workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Somethings"),
 		//recorder:          recorder,
 	}
 
-	glog.Info("Setting up event handlers")
+	fmt.Printf("\n>>>>>>>>>> Setting up event handlers")
 	// Set up an event handler for when Foo resources change
 	controller.somethingsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		//AddFunc: controller.handleObject,
 		AddFunc: func(obj interface{}) {
 			if key, err := cache.MetaNamespaceKeyFunc(obj); err == nil {
-				controller.somethingsQueue.AddRateLimited(key)
+				controller.somethingsQueue.Add(key)
+			} else {
+				runtime.HandleError(err)
 			}
 		},
 		UpdateFunc: func(old, new interface{}) {
@@ -116,12 +112,12 @@ func NewController(
 	// handling Deployment resources. More info on this pattern:
 	// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
 	controller.deploymentsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		//AddFunc: controller.handleObject,
-		AddFunc: func(obj interface{}) {
-			if key, err := cache.MetaNamespaceKeyFunc(obj); err == nil {
-				controller.deploymentsQueue.Add(key)
-			}
-		},
+		AddFunc: controller.handleObject,
+		//AddFunc: func(obj interface{}) {
+		//	if key, err := cache.MetaNamespaceKeyFunc(obj); err == nil {
+		//		controller.deploymentsQueue.Add(key)
+		//	}
+		//},
 		UpdateFunc: func(old, new interface{}) {
 			newDeploy := new.(*appsv1beta2.Deployment)
 			oldDeploy := old.(*appsv1beta2.Deployment)
@@ -130,19 +126,20 @@ func NewController(
 				// Periodic resync will send update events for all known Deployments.
 				// Two different versions of the same Deployment will always have different RVs.
 				return
-			} else {
-				if key, err := cache.MetaNamespaceKeyFunc(new); err == nil {
-					controller.deploymentsQueue.Add(key)
-				}
 			}
-			//controller.handleObject(new)
+			//else {
+			//	if key, err := cache.MetaNamespaceKeyFunc(new); err == nil {
+			//		controller.deploymentsQueue.Add(key)
+			//	}
+			//}
+			controller.handleObject(new)
 		},
-		//DeleteFunc: controller.handleObject,
-		DeleteFunc: func(obj interface{}) {
-			if key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj); err == nil {
-				controller.deploymentsQueue.Add(key)
-			}
-		},
+		DeleteFunc: controller.handleObject,
+		//DeleteFunc: func(obj interface{}) {
+		//	if key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj); err == nil {
+		//		controller.deploymentsQueue.Add(key)
+		//	}
+		//},
 	})
 
 	return controller
