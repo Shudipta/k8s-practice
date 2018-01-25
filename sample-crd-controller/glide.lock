@@ -1,5 +1,5 @@
 hash: 3e57a8e647e43ccf7b7e02d5e4644ac5fa051c1db7a5e3a82173a37a2f553146
-updated: 2018-01-24T12:10:36.826103757+06:00
+updated: 2018-01-25T14:39:04.439891181+06:00
 imports:
 - name: github.com/davecgh/go-spew
   version: 782f4967f2dc4564575ca782fe2d04090b5faca8
@@ -26,10 +26,6 @@ imports:
   - sortkeys
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
-- name: github.com/golang/groupcache
-  version: 02826c3e79038b59d737d3b1c0a1d937f71a4433
-  subpackages:
-  - lru
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
@@ -183,18 +179,15 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
-  - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/runtime
   - pkg/util/sets
-  - pkg/util/strategicpatch
   - pkg/util/validation
   - pkg/util/validation/field
   - pkg/util/wait
   - pkg/util/yaml
   - pkg/version
   - pkg/watch
-  - third_party/forked/golang/json
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
   version: 78700dec6369ba22221b72770783300f143df150
@@ -298,9 +291,6 @@ imports:
   - pkg/version
   - rest
   - rest/watch
-  - scale/scheme
-  - scale/scheme/appsv1beta1
-  - scale/scheme/appsv1beta2
   - testing
   - tools/auth
   - tools/cache
@@ -310,7 +300,6 @@ imports:
   - tools/clientcmd/api/v1
   - tools/metrics
   - tools/pager
-  - tools/record
   - tools/reference
   - transport
   - util/buffer
