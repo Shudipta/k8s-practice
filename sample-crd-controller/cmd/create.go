@@ -26,6 +26,7 @@ import (
 	kubeinformers "k8s.io/client-go/informers"
 	informers "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
 	"k8s-practice/sample-crd-controller/controller"
+	//"k8s.io/client-go/rest"
 )
 
 // createCmd represents the create command
@@ -44,6 +45,22 @@ to quickly create a Cobra application.`,
 
 		stopCh := make(chan struct{})
 		defer close(stopCh)
+
+		//config, err := rest.InClusterConfig()
+		//if err != nil {
+		//	log.Fatalf("Error building config for inCluster access: %s", err.Error())
+		//}
+		//// creates the clientset
+		//exampleClient, err := kubernetes.NewForConfig(config)
+		//if err != nil {
+		//	log.Fatalf("Error building example clientset: %s", err.Error())
+		//}
+		//// creates the kubeClient
+		//kubeClient, err := kubernetes.NewForConfig(config)
+		//if err != nil {
+		//	log.Fatalf("Error building kubernetes clientset: %s", err.Error())
+		//}
+
 
 		cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {

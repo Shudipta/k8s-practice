@@ -1,0 +1,21 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: sample-crd-controller-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crd-controller
+  template:
+    metadata:
+      labels:
+        app: crd-controller
+    spec:
+      serviceAccountName: ctl-svc-acc
+      containers:
+          - name: crd-controller
+            imagePullPolicy: Always
+            image: shudipta/samp-crd-ctl
+            ports:
+              - containerPort: 10000

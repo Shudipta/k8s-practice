@@ -17,8 +17,8 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"k8s.io/client-go/util/homedir"
-	"path/filepath"
+	//"k8s.io/client-go/util/homedir"
+	//"path/filepath"
 	"github.com/spf13/cobra"
 	"flag"
 )
@@ -51,10 +51,10 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().AddGoFlagSet(flag.CommandLine)
-	home := homedir.HomeDir();
-	value := filepath.Join(home, ".kube", "config")
+	//home := homedir.HomeDir();
+	//value := filepath.Join(home, ".kube", "config")
 	usage := "(optional) absolute path to the kubeconfig file"
-	rootCmd.PersistentFlags().StringVarP(&kubeconfig, "kubeConfigPath", "k", value, usage)
+	rootCmd.PersistentFlags().StringVarP(&kubeconfig, "kubeConfigPath", "k", "", usage)
 	rootCmd.PersistentFlags().StringVarP(&masterURL, "masterConfigAddress", "m", "",
 		"The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster.")
 }
