@@ -4,5 +4,5 @@ metadata:
   name: something-exmp
 spec:
   deploymentName: something-exmp
-  replicas: 2
+  replicas: 1
   

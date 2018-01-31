@@ -19,3 +19,10 @@ import:
   repo: https://github.com/appscode/pflag.git
   vcs: git
   version: master
+- package: k8s.io/apiextensions-apiserver
+  version: d0becfa6529e20309bd6684f8486abc265cf0b59
+  subpackages:
+  - pkg/apis/apiextensions
+  - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset/scheme
+  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
