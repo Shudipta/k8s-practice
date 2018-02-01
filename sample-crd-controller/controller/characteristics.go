@@ -15,9 +15,7 @@ import (
 	//"k8s.io/client-go/scale/scheme/appsv1beta1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	samplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
-	//metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
-	//"fmt"
 	"fmt"
 )
 
@@ -34,9 +32,9 @@ type Controller struct {
 
 	deploymentsInformer	cache.SharedIndexInformer
 	somethingsInformer	cache.SharedIndexInformer
-
-	deploymentsSynced	cache.InformerSynced
-	somethingsSynced	cache.InformerSynced
+	//
+	//deploymentsSynced	cache.InformerSynced
+	//somethingsSynced	cache.InformerSynced
 
 	//kubType				string
 	//recorder			record.EventRecorder
@@ -64,16 +62,13 @@ func NewController(
 		deploymentsInformer:deploymentInformer.Informer(),
 		somethingsInformer:	somethingInformer.Informer(),
 
-		deploymentsSynced:	deploymentInformer.Informer().HasSynced,
-		somethingsSynced:	somethingInformer.Informer().HasSynced,
-
 		//deploymentsQueue:	workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Deployments"),
 		somethingsQueue:	workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Somethings"),
 		//recorder:          recorder,
 	}
 
-	fmt.Printf("\n>>>>>>>>>> Setting up event handlers")
-	// Set up an event handler for when Foo resources change
+	fmt.Println("Setting up event handlers")
+	// Set up an event handler for when Something resources change
 	controller.somethingsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		//AddFunc: controller.handleObject,
 		AddFunc: func(obj interface{}) {

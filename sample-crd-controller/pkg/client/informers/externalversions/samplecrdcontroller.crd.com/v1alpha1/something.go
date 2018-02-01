@@ -47,26 +47,26 @@ type somethingInformer struct {
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
 func NewSomethingInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredSomethingInformer(client, namespace, resyncPeriod, indexers, nil)
+	return NewFilteredSomethingInformer(client, namespace, resyncPeriod, indexers)
 }
 
 // NewFilteredSomethingInformer constructs a new informer for Something type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredSomethingInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredSomethingInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
-				if tweakListOptions != nil {
-					tweakListOptions(&options)
-				}
-				return client.SamplecrdcontrollerV1alpha1().Somethings(namespace).List(options)
+				//if tweakListOptions != nil {
+				//	tweakListOptions(&options)
+				//}
+				return client.SamplecrdcontrollerV1alpha1().Somethings(namespace).List(v1.ListOptions{IncludeUninitialized:true})
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
-				if tweakListOptions != nil {
-					tweakListOptions(&options)
-				}
-				return client.SamplecrdcontrollerV1alpha1().Somethings(namespace).Watch(options)
+				//if tweakListOptions != nil {
+				//	tweakListOptions(&options)
+				//}
+				return client.SamplecrdcontrollerV1alpha1().Somethings(namespace).Watch(v1.ListOptions{IncludeUninitialized:true})
 			},
 		},
 		&samplecrdcontroller_crd_com_v1alpha1.Something{},
@@ -76,7 +76,7 @@ func NewFilteredSomethingInformer(client versioned.Interface, namespace string, 
 }
 
 func (f *somethingInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredSomethingInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+	return NewFilteredSomethingInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 }
 
 func (f *somethingInformer) Informer() cache.SharedIndexInformer {

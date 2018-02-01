@@ -28,17 +28,17 @@ func (c *Controller) handleObject(obj interface{}) {
 	if object, ok = obj.(metav1.Object); !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
-			runtime.HandleError(fmt.Errorf("\n>>>>>>>>>> error decoding object, invalid type"))
+			runtime.HandleError(fmt.Errorf("error decoding object, invalid type\n"))
 			return
 		}
 		object, ok = tombstone.Obj.(metav1.Object)
 		if !ok {
-			runtime.HandleError(fmt.Errorf("\n>>>>>>>>>> error decoding object tombstone, invalid type"))
+			runtime.HandleError(fmt.Errorf("error decoding object tombstone, invalid type\n"))
 			return
 		}
-		fmt.Printf("\n>>>>>>>>>> Recovered deleted object '%s' from tombstone", object.GetName())
+		fmt.Println(" Recovered deleted object '%s' from tombstone\n", object.GetName())
 	}
-	fmt.Printf("\n>>>>>>>>>> Processing object: %s", object.GetName())
+	fmt.Println("Processing object: %s\n", object.GetName())
 	if ownerRef := metav1.GetControllerOf(object); ownerRef != nil {
 		// If this object is not owned by a Foo, we should not do anything more
 		// with it.
@@ -48,7 +48,7 @@ func (c *Controller) handleObject(obj interface{}) {
 
 		something, err := c.somethingsLister.Somethings(object.GetNamespace()).Get(ownerRef.Name)
 		if err != nil {
-			fmt.Printf("\n>>>>>>>>>> ignoring orphaned object '%s' of something '%s'", object.GetSelfLink(), ownerRef.Name)
+			fmt.Println("ignoring orphaned object '%s' of something '%s'", object.GetSelfLink(), ownerRef.Name)
 			return
 		}
 
@@ -72,15 +72,16 @@ func (c *Controller) Run(threadiness int, stopCh chan struct{}) error {
 	defer c.somethingsQueue.ShutDown()
 
 	// Start the informer factories to begin populating the informer caches
-	fmt.Printf("\n>>>>>>>>>> Starting Something controller")
+	fmt.Println("Starting Something controller")
 
 	// wait for the caches to synchronize before starting the worker
-	fmt.Printf("\n>>>>>>>>>> Waiting for informer caches to sync")
-	if !cache.WaitForCacheSync(stopCh, c.deploymentsSynced, c.somethingsSynced) {
+	fmt.Println("Waiting for informer caches to sync")
+	if !cache.WaitForCacheSync(stopCh, c.somethingsInformer.HasSynced, c.deploymentsInformer.HasSynced) {
+		fmt.Println("Timed out waiting for caches to sync")
 		return fmt.Errorf("Timed out waiting for caches to sync")
 	}
 
-	fmt.Printf("\n>>>>>>>>>> Starting workers")
+	fmt.Println("Starting workers")
 	// Launch two workers to process Something resources
 	// runWorker will loop until "something bad" happens.  The .Until will
 	// then rekick the worker after one second
@@ -89,9 +90,9 @@ func (c *Controller) Run(threadiness int, stopCh chan struct{}) error {
 		//go wait.Until(c.runDeploymentWorker, time.Second, stopCh)
 	}
 
-	fmt.Printf("\n>>>>>>>>>> Started workers")
+	fmt.Println("Started workers")
 	<-stopCh
-	fmt.Printf("\n>>>>>>>>>> Shutting down workers")
+	fmt.Println("Shutting down workers")
 
 	return nil
 }
@@ -113,7 +114,6 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 		return false
 	}
 
-
 	// you always have to indicate to the queue that you've completed a piece of
 	// work
 	defer c.somethingsQueue.Done(obj)
@@ -125,12 +125,12 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 		// No error, tell the queue to stop tracking history
 		c.somethingsQueue.Forget(obj)
 	} else if c.somethingsQueue.NumRequeues(obj) < 10 {
-		fmt.Printf("\n>>>>>>>>>> Error processing %s (will retry): %v", obj, err)
+		fmt.Println("Error processing %s (will retry): %v", obj, err)
 		// requeue the item to work on later
 		c.somethingsQueue.AddRateLimited(obj)
 	} else {
 		// err != nil and too many retries
-		fmt.Printf("\n>>>>>>>>>> Error processing %s (giving up): %v", obj, err)
+		fmt.Println("Error processing %s (giving up): %v", obj, err)
 		c.somethingsQueue.Forget(obj)
 		runtime.HandleError(err)
 	}
@@ -142,22 +142,38 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 // converge the two. It then updates the Status block of the Something resource
 // with the current status of the resource.
 func (c *Controller) somethingSyncHandler(key string) error {
+	fmt.Println("handling the something resource named \"something-exmp\"...")
 	// Convert the namespace/name string into a distinct namespace and name
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		runtime.HandleError(fmt.Errorf("\n>>>>>>>>>> invalid resource key: %s", key))
+		runtime.HandleError(fmt.Errorf("invalid resource key: %s\n", key))
 		return nil
 	}
+	fmt.Printf("key -> %s, Namespace -> %s, name -> %s\n", key, namespace, name)
 
 	// Get the Something resource with this namespace/name
 	something, err := c.somethingsLister.Somethings(namespace).Get(name)
 	if err != nil {
 		// The Something resource may no longer exist, in which case we stop processing.
 		if errors.IsNotFound(err) {
-			runtime.HandleError(fmt.Errorf("\n>>>>>>>>>> something '%s' in work queue (somethingsQueue) no longer exists", key))
+			runtime.HandleError(fmt.Errorf("something '%s' in work queue (somethingsQueue) no longer exists\n", key))
 			return nil
 		}
+		fmt.Println("err in getting something resource is ", err)
 
+		return err
+	}
+	fmt.Println(something.Namespace, "/", something.Name)
+
+	// initializer's tasks
+	if init_triggered, err := c.initialize(something); init_triggered {
+		fmt.Println("occuring errror in \"initialize()\" method is", err)
+		return err
+	}
+
+	// finalizer's tasks
+	if fin_triggered, err := c.finalize(something); fin_triggered {
+		fmt.Println("occuring errror in \"finalize()\" method is", err)
 		return err
 	}
 
@@ -166,9 +182,10 @@ func (c *Controller) somethingSyncHandler(key string) error {
 		// We choose to absorb the error here as the worker would requeue the
 		// resource otherwise. Instead, the next time the resource is updated
 		// the resource will be queued again.
-		runtime.HandleError(fmt.Errorf("\n>>>>>>>>>> %s: deployment name must be specified", key))
+		runtime.HandleError(fmt.Errorf("%s: deployment name must be specified\n", key))
 		return nil
 	}
+	fmt.Printf("deployment Name -> %s\n", deploymentName)
 
 	// Get the deployment with the name specified in Something.spec
 	deployment, err := c.deploymentsLister.Deployments(something.Namespace).Get(deploymentName)
@@ -181,22 +198,24 @@ func (c *Controller) somethingSyncHandler(key string) error {
 	// attempt processing again later. This could have been caused by a
 	// temporary network failure, or any other transient reason.
 	if err != nil {
+		fmt.Println("error in getting/creating deploy is:", err)
 		return err
 	}
 
 	// If the Deployment is not controlled by this Something resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(deployment, something) {
-		msg := fmt.Sprintf("\n>>>>>>>>>> Resource %q already exists and is not managed by Something", deployment.Name)
+		msg := fmt.Sprintf("Resource %q already exists and is not managed by Something\n", deployment.Name)
 		//c.recorder.Event(Something, corev1.EventTypeWarning, ErrResourceExists, msg)
 		return fmt.Errorf(msg)
 	}
+	fmt.Println(deployment.Name, "is controlled by",something.Name)
 
 	// If the number of the replicas on the Something resource is specified, and the
 	// number does not equal the current desired replicas on the Deployment, we
 	// should update the Deployment resource.
 	if something.Spec.Replicas != nil && *something.Spec.Replicas != *deployment.Spec.Replicas {
-		fmt.Printf("\n>>>>>>>>>> SomethingR: %d, deployR: %d", *something.Spec.Replicas, *deployment.Spec.Replicas)
+		fmt.Println("SomethingR: %d, deployR: %d", *something.Spec.Replicas, *deployment.Spec.Replicas)
 		deployment, err = c.kubeclientset.AppsV1beta2().Deployments(something.Namespace).Update(newDeployment(something))
 	}
 
@@ -204,15 +223,19 @@ func (c *Controller) somethingSyncHandler(key string) error {
 	// attempt processing again later. This could have been caused by a
 	// temporary network failure, or any other transient reason.
 	if err != nil {
+		fmt.Println("error occured in updating deployment", deployment.Name, "is", err)
 		return err
 	}
+	fmt.Println("no error in updating deployment", deployment.Name)
 
 	// Finally, we update the status block of the Something resource to reflect the
 	// current state of the world
 	err = c.updateSomethingStatus(something, deployment)
 	if err != nil {
+		fmt.Println("error occured in updating status of something", something.Name, "is", err)
 		return err
 	}
+	fmt.Println(something.Name, "is updated")
 
 	//c.recorder.Event(foo, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)
 	return nil
@@ -234,9 +257,9 @@ func (c *Controller) updateSomethingStatus(
 	return err
 }
 
-// newDeployment creates a new Deployment for a Foo resource. It also sets
+// newDeployment creates a new Deployment for a Something resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
-// the Foo resource that 'owns' it.
+// the Something resource that 'owns' it.
 func newDeployment(something *samplecrdcontrollerv1alpha1.Something) *appsv1beta2.Deployment {
 	labels := map[string]string{
 		"app":        "book-server",
