@@ -5,7 +5,7 @@
 # - ???
 # - Profit
 
-pushd $GOPATH/src/k8s-practice/sample-crd-controller
+pushd $GOPATH/src/github.com/shudipta/k8s-practice/sample-crd-controller
 
 glide up -v
 glide vc --only-code --no-tests

@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"k8s-practice/book-server-with-client-go/book-server-config"
+	"github.com/shudipta/k8s-practice/book-server-with-client-go/book-server-config"
 )
 
 // deployCmd represents the deploy command

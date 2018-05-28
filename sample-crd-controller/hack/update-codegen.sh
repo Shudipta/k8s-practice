@@ -14,7 +14,7 @@ CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-ge
 #echo ">>>>>>>> SCRIPT_ROOT = " $SCRIPT_ROOT
 #echo ">>>>>>>> CODEGEN_PKG = " $CODEGEN_PKG
 ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
-  k8s-practice/sample-crd-controller/pkg/client k8s-practice/sample-crd-controller/pkg/apis \
+  github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client github.com/shudipta/k8s-practice/sample-crd-controller/pkg/apis \
   samplecrdcontroller.crd.com:v1alpha1
 
 #--output-base "$(dirname ${BASH_SOURCE})/../../.."

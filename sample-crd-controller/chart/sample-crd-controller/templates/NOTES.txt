@@ -1,0 +1,2 @@
+1. Check whether the controller pod is running or not by running the following command:
+kubectl get pod --namespace {{ .Release.Namespace }} -l "app={{ template "sample-crd-controller.name" . }},release={{ .Release.Name }}"

@@ -14,7 +14,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
-	samplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
+	samplecrdcontrollerv1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
 )
 
 // handleObject will take any resource implementing metav1.Object and attempt

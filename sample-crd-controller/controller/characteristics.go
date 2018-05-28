@@ -2,8 +2,8 @@ package controller
 
 import (
 	"k8s.io/client-go/kubernetes"
-	clientset "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
-	listers "k8s-practice/sample-crd-controller/pkg/client/listers/samplecrdcontroller.crd.com/v1alpha1"
+	clientset "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
+	listers "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/listers/samplecrdcontroller.crd.com/v1alpha1"
 	kubelisters "k8s.io/client-go/listers/apps/v1beta2"
 	"k8s.io/client-go/util/workqueue"
 	//"k8s.io/client-go/tools/record"
@@ -11,10 +11,10 @@ import (
 	//"github.com/golang/glog"
 	//"k8s.io/client-go/scale/scheme/appsv1beta2"
 	kubeinformers "k8s.io/client-go/informers"
-	informers "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
+	informers "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
 	//"k8s.io/client-go/scale/scheme/appsv1beta1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
-	samplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
+	samplecrdcontrollerv1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"fmt"
 )

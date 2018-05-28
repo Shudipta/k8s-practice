@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	samplecrdcontroller_crd_com_v1alpha1 "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
-	versioned "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
-	internalinterfaces "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "k8s-practice/sample-crd-controller/pkg/client/listers/samplecrdcontroller.crd.com/v1alpha1"
+	samplecrdcontroller_crd_com_v1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com/v1alpha1"
+	versioned "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/listers/samplecrdcontroller.crd.com/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

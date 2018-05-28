@@ -14,7 +14,7 @@
 
 package main
 
-import "k8s-practice/sample-crd-controller/cmd"
+import "github.com/shudipta/k8s-practice/sample-crd-controller/cmd"
 
 func main() {
 	cmd.Execute()

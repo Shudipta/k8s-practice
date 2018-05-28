@@ -1,4 +1,4 @@
-package: k8s-practice/sample-crd-controller
+package: github.com/shudipta/k8s-practice/sample-crd-controller
 import:
 - package: k8s.io/apimachinery
   subpackages:

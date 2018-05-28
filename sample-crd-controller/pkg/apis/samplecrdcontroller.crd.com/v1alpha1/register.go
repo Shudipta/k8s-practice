@@ -5,7 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	samplecrdcontroller "k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com"
+	samplecrdcontroller "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/apis/samplecrdcontroller.crd.com"
 )
 
 // SchemeGroupVersion is group version used to register these objects

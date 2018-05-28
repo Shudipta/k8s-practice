@@ -19,9 +19,9 @@ limitations under the License.
 package externalversions
 
 import (
-	versioned "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
-	internalinterfaces "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
-	samplecrdcontroller_crd_com "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/samplecrdcontroller.crd.com"
+	versioned "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
+	samplecrdcontroller_crd_com "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/samplecrdcontroller.crd.com"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

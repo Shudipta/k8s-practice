@@ -5,4 +5,3 @@ metadata:
 spec:
   deploymentName: something-exmp
   replicas: 1
-  

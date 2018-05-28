@@ -14,8 +14,8 @@ spec:
     spec:
       serviceAccountName: ctl-svc-acc
       containers:
-          - name: crd-controller
-            imagePullPolicy: Always
-            image: shudipta/samp-crd-ctl
-            ports:
-              - containerPort: 10000
+        - name: crd-controller
+          imagePullPolicy: Always
+          image: shudipta/samp-crd-ctl
+          ports:
+            - containerPort: 10000

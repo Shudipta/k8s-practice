@@ -1,0 +1,24 @@
+{{ if .Values.initializers.enable }}
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: InitializerConfiguration
+metadata:
+  name: {{ template "sample-crd-controller.fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: "{{ template "sample-crd-controller.name" . }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+initializers:
+  # the name needs to be fully qualified, i.e., containing at least two "."
+  - name: fun.samplecrdcontroller.crd.com
+    rules:
+      # apiGroups, apiVersion, resources all support wildcard "*".
+      # "*" cannot be mixed with non-wildcard.
+      - apiGroups:
+          - "samplecrdcontroller.crd.com"
+        apiVersions:
+          - v1alpha1
+        resources:
+          - somethings
+
+{{ end }}

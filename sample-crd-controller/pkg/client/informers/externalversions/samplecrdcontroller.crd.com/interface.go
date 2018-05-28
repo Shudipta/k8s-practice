@@ -19,8 +19,8 @@ limitations under the License.
 package samplecrdcontroller
 
 import (
-	internalinterfaces "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/samplecrdcontroller.crd.com/v1alpha1"
+	internalinterfaces "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions/samplecrdcontroller.crd.com/v1alpha1"
 )
 
 // Interface provides access to each of this group's versions.

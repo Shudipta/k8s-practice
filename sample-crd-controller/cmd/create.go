@@ -21,11 +21,11 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/kubernetes"
-	clientset "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
+	clientset "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
 	"time"
 	kubeinformers "k8s.io/client-go/informers"
-	informers "k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
-	"k8s-practice/sample-crd-controller/controller"
+	informers "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/informers/externalversions"
+	"github.com/shudipta/k8s-practice/sample-crd-controller/controller"
 	//"k8s.io/client-go/rest"
 )
 

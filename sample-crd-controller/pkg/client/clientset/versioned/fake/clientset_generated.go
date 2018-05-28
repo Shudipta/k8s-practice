@@ -17,9 +17,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
-	samplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned/typed/samplecrdcontroller.crd.com/v1alpha1"
-	fakesamplecrdcontrollerv1alpha1 "k8s-practice/sample-crd-controller/pkg/client/clientset/versioned/typed/samplecrdcontroller.crd.com/v1alpha1/fake"
+	clientset "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned"
+	samplecrdcontrollerv1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned/typed/samplecrdcontroller.crd.com/v1alpha1"
+	fakesamplecrdcontrollerv1alpha1 "github.com/shudipta/k8s-practice/sample-crd-controller/pkg/client/clientset/versioned/typed/samplecrdcontroller.crd.com/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
