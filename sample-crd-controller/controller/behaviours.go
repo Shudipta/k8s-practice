@@ -36,9 +36,9 @@ func (c *Controller) handleObject(obj interface{}) {
 			runtime.HandleError(fmt.Errorf("error decoding object tombstone, invalid type\n"))
 			return
 		}
-		fmt.Println(" Recovered deleted object '%s' from tombstone\n", object.GetName())
+		fmt.Printf(" Recovered deleted object '%s' from tombstone\n", object.GetName())
 	}
-	fmt.Println("Processing object: %s\n", object.GetName())
+	fmt.Printf("Processing object: %s\n", object.GetName())
 	if ownerRef := metav1.GetControllerOf(object); ownerRef != nil {
 		// If this object is not owned by a Foo, we should not do anything more
 		// with it.
@@ -48,7 +48,7 @@ func (c *Controller) handleObject(obj interface{}) {
 
 		something, err := c.somethingsLister.Somethings(object.GetNamespace()).Get(ownerRef.Name)
 		if err != nil {
-			fmt.Println("ignoring orphaned object '%s' of something '%s'", object.GetSelfLink(), ownerRef.Name)
+			fmt.Printf("ignoring orphaned object '%s' of something '%s'", object.GetSelfLink(), ownerRef.Name)
 			return
 		}
 
@@ -78,7 +78,7 @@ func (c *Controller) Run(threadiness int, stopCh chan struct{}) error {
 	fmt.Println("Waiting for informer caches to sync")
 	if !cache.WaitForCacheSync(stopCh, c.somethingsInformer.HasSynced, c.deploymentsInformer.HasSynced) {
 		fmt.Println("Timed out waiting for caches to sync")
-		return fmt.Errorf("Timed out waiting for caches to sync")
+		return fmt.Errorf("%s", "Timed out waiting for caches to sync")
 	}
 
 	fmt.Println("Starting workers")
@@ -125,12 +125,12 @@ func (c *Controller) processNextSomethingWorkItem() bool {
 		// No error, tell the queue to stop tracking history
 		c.somethingsQueue.Forget(obj)
 	} else if c.somethingsQueue.NumRequeues(obj) < 10 {
-		fmt.Println("Error processing %s (will retry): %v", obj, err)
+		fmt.Printf("Error processing %s (will retry): %v", obj, err)
 		// requeue the item to work on later
 		c.somethingsQueue.AddRateLimited(obj)
 	} else {
 		// err != nil and too many retries
-		fmt.Println("Error processing %s (giving up): %v", obj, err)
+		fmt.Printf("Error processing %s (giving up): %v", obj, err)
 		c.somethingsQueue.Forget(obj)
 		runtime.HandleError(err)
 	}
